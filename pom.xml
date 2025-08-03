@@ -7,8 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version>
-        <relativePath/>
+        <version>3.5.4</version>
     </parent>
 
     <groupId>com.example</groupId>
@@ -128,7 +127,7 @@
     </build>
 
     <profiles>
-        <!-- Karate smoke tests profile - ONLY way to run Karate tests -->
+        <!-- Karate smoke tests profile -->
         <profile>
             <id>karate-smoke</id>
             <activation>
@@ -140,20 +139,25 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>3.5.3</version>
-                        <configuration>
-                            <!-- Override default exclusions -->
-                            <excludes>
-                                <exclude>**/config/*Test.java</exclude>
-                            </excludes>
-                            <systemPropertyVariables>
-                                <karate.env>${test.env}</karate.env>
-                                <test.env>${test.env}</test.env>
-                                <is.aws>${is.aws}</is.aws>
-                            </systemPropertyVariables>
-                            <includes>
-                                <include>**/SmokeTestRunner.java</include>
-                            </includes>
-                        </configuration>
+                                        <configuration>
+                    <!-- Override default exclusions -->
+                    <excludes>
+                        <exclude>**/config/*Test.java</exclude>
+                    </excludes>
+                    <systemPropertyVariables>
+                        <karate.env>${test.env}</karate.env>
+                        <test.env>${test.env}</test.env>
+                        <is.aws>${is.aws}</is.aws>
+                    </systemPropertyVariables>
+                    <includes>
+                        <include>**/SmokeTestRunner.java</include>
+                    </includes>
+                    <!-- Ensure JUnit XML reports are generated -->
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <useFile>true</useFile>
+                    <!-- Fail build on test failures -->
+                    <testFailureIgnore>false</testFailureIgnore>
+                </configuration>
                     </plugin>
                 </plugins>
             </build>
