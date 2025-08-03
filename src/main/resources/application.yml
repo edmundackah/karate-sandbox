@@ -7,14 +7,14 @@ spring:
 
 logging:
   level:
-    com.example.karate: DEBUG
-    org.springframework.web: DEBUG
+    com.example.karate: INFO
+    org.springframework.web: INFO
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        include: "health,info"
       base-path: /actuator
   endpoint:
     health:
