@@ -1,0 +1,7 @@
+{
+  "name": "Test Laptop",
+  "description": "High-performance test laptop for development",
+  "price": 1299.99,
+  "category": "Electronics",
+  "quantity": 5
+}

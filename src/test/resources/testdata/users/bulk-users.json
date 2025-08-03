@@ -1,0 +1,20 @@
+[
+  {
+    "name": "John Tester",
+    "email": "john.tester@example.com",
+    "role": "user",
+    "active": true
+  },
+  {
+    "name": "Jane Admin",
+    "email": "jane.admin@example.com",
+    "role": "admin",
+    "active": true
+  },
+  {
+    "name": "Bob Inactive",
+    "email": "bob.inactive@example.com",
+    "role": "user",
+    "active": false
+  }
+]
