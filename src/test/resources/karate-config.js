@@ -16,7 +16,7 @@ function fn() {
   if (env === 'local') {
     config.baseUrl = 'http://localhost:8085';
     config.tokenUrl = 'http://localhost:8085/api/token/generate';
-    config.requiresToken = false; // Local doesn't need token
+    config.requiresToken = true;
   } else if (env === 'dev') {
     config.baseUrl = 'https://dev-api.example.com';
     config.tokenUrl = 'https://dev-token.example.com/api/token/generate';
@@ -43,6 +43,12 @@ function fn() {
     service: 'karate-tests',
     environment: env
   };
+
+  // Initialize authHeader to prevent reference errors
+  config.authHeader = {};
+
+  // Note: Authentication will be handled in individual test features
+  // This prevents issues with HTTP calls during configuration loading
 
   karate.log('Configuration loaded:', config);
   return config;

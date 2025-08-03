@@ -40,4 +40,81 @@ public class TokenController {
         }
         return ResponseEntity.badRequest().body("Invalid token");
     }
+
+    @PostMapping("/validate-auth-header")
+    public ResponseEntity<Map<String, Object>> validateAuthHeader(@RequestHeader(value = "iam-claimsetjwt", required = false) String jwtToken) {
+        Map<String, Object> response = new HashMap<>();
+        
+        if (jwtToken == null || jwtToken.trim().isEmpty()) {
+            response.put("valid", false);
+            response.put("error", "Missing JWT token in iam-claimsetjwt header");
+            response.put("status", "UNAUTHORIZED");
+            return ResponseEntity.status(401).body(response);
+        }
+        
+        try {
+            // Basic JWT structure validation
+            String[] parts = jwtToken.split("\\.");
+            if (parts.length != 3) {
+                response.put("valid", false);
+                response.put("error", "Invalid JWT structure - expected 3 parts");
+                response.put("status", "INVALID_TOKEN");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Decode and validate header
+            String headerJson = new String(Base64.getDecoder().decode(parts[0]));
+            if (!headerJson.contains("\"typ\":\"JWT\"") || !headerJson.contains("\"alg\":")) {
+                response.put("valid", false);
+                response.put("error", "Invalid JWT header");
+                response.put("status", "INVALID_HEADER");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Decode and validate payload
+            String payloadJson = new String(Base64.getDecoder().decode(parts[1]));
+            if (!payloadJson.contains("\"sub\"") || !payloadJson.contains("\"iat\"") || !payloadJson.contains("\"exp\"")) {
+                response.put("valid", false);
+                response.put("error", "Invalid JWT payload - missing required claims");
+                response.put("status", "INVALID_PAYLOAD");
+                return ResponseEntity.badRequest().body(response);
+            }
+            
+            // Check if token is expired
+            long currentTime = System.currentTimeMillis() / 1000;
+            if (payloadJson.contains("\"exp\":")) {
+                try {
+                    String expStr = payloadJson.split("\"exp\":")[1].split("}")[0];
+                    long expTime = Long.parseLong(expStr);
+                    if (currentTime > expTime) {
+                        response.put("valid", false);
+                        response.put("error", "JWT token has expired");
+                        response.put("status", "EXPIRED");
+                        return ResponseEntity.status(401).body(response);
+                    }
+                } catch (Exception e) {
+                    // If we can't parse the expiration, we'll assume it's valid for now
+                    // In a real implementation, you might want to be more strict
+                }
+            }
+            
+            // Token is valid
+            response.put("valid", true);
+            response.put("message", "JWT token is valid");
+            response.put("status", "VALID");
+            response.put("tokenInfo", Map.of(
+                "header", headerJson,
+                "payload", payloadJson,
+                "signature", parts[2]
+            ));
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            response.put("valid", false);
+            response.put("error", "Failed to validate JWT token: " + e.getMessage());
+            response.put("status", "VALIDATION_ERROR");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
 }

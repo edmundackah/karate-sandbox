@@ -6,7 +6,7 @@ Background:
   * configure headers = defaultHeaders
   # Get token if required for this environment
   * if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-  * if (requiresToken) configure headers = karate.merge(defaultHeaders, authHeader)
+  * if (requiresToken) karate.configure('headers', karate.merge(defaultHeaders, authHeader))
 
 @users @datatable @parallel
 Scenario Outline: Create multiple users with different data

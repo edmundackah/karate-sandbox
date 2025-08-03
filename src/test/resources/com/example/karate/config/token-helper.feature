@@ -16,5 +16,8 @@ Scenario: Get authentication token
   * karate.set('authKey', 'iam-claimsetjwt')
   * karate.set('authHeader', authHeader)
   
+  # Also set the global authHeader variable
+  * def authHeader = authHeader
+  
   # Log token details for debugging
   * karate.log('Token obtained: iam-claimsetjwt =', response['iam-claimsetjwt'].substring(0, 20) + '...')
