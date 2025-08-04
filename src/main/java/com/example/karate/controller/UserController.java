@@ -17,7 +17,7 @@ public class UserController {
     private Long nextId = 1L;
 
     public UserController() {
-        // Initialize with some dummy data
+        // Initialise with some dummy data
         users.add(new User(nextId++, "John Doe", "john.doe@example.com", "admin", true));
         users.add(new User(nextId++, "Jane Smith", "jane.smith@example.com", "user", true));
         users.add(new User(nextId++, "Bob Johnson", "bob.johnson@example.com", "user", false));

@@ -1,10 +1,10 @@
-# 🥋 Karate Sandbox - Complete API Testing Framework
+# 🥋 Karate API Testing Sandbox
 
-A comprehensive **Karate API testing framework** with Spring Boot backend, demonstrating best practices for behavior-driven development (BDD) and API automation.
+## Overview
 
-## **🚀 Quick Start**
+This Karate Sandbox project includes comprehensive documentation to help you get started quickly and write efficient test suites.
 
-### 1. **Build & Test**
+## **Build & Test**
 ```bash
 # Build project (unit tests only) 
 mvn clean install
@@ -13,10 +13,10 @@ mvn clean install
 mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local
 
 # Run specific test features
-mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local -Dkarate.options="classpath:com/example/karate/config/working-auth-validation.feature"
+mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local -Dkarate.options="classpath:com/example/karate/config/auth-header-validation.feature"
 ```
 
-### 2. **Using Tags for Selective Testing**
+### **Using Tags for Selective Testing**
 ```bash
 # Run tests with specific tags
 mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local -Dkarate.options="--tags @smoke"
@@ -32,13 +32,13 @@ mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local -Dkarate.options="--tags 
 mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local -Dkarate.options="--tags @smoke,@auth"
 ```
 
-### 3. **View Test Reports**
+### **View Test Reports**
 ```bash
 # Open test reports in browser
 open target/karate-reports/*.html
 ```
 
-### 4. **Test Different Environments**
+### **Test Different Environments**
 ```bash
 # Local environment (default)
 mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local
@@ -50,7 +50,7 @@ mvn clean test -Dtest=SmokeTestRunner -Dtest.env=dev -Dis.aws=true
 mvn clean test -Dtest=SmokeTestRunner -Dtest.env=prod
 ```
 
-## **🧪 Test Examples**
+## ** Test Examples**
 - **Setup & Health Checks** - API connectivity validation
 - **User CRUD Operations** - Complete lifecycle testing  
 - **Advanced Scenarios** - Conditional logic and dynamic requests
@@ -86,33 +86,36 @@ POST http://localhost:8085/api/token/generate
 POST http://localhost:8085/api/token/validate-auth-header
 ```
 
-## **📚 Documentation**
-- **[SETUP.md](SETUP.md)** - Step-by-step installation instructions
-- **[EXAMPLES.md](EXAMPLES.md)** - Detailed test examples with explanations
-- **[TEST_EXAMPLES_EXPLAINED.md](TEST_EXAMPLES_EXPLAINED.md)** - In-depth test breakdowns
+## ** Authentication System**
 
-## **🔐 Authentication Header Validation**
+- **Automatic Token Management**: Handles token generation and caching automatically
+- **Environment-Aware**: Returns real tokens or dummy headers based on configuration
+- **Zero Configuration**: Just call `getAuthHeaders()` in your tests
 
-The sandbox includes a comprehensive JWT token validation system:
-
-### **New Authentication Endpoint**
+### **Authentication Endpoints**
+- **POST** `/api/token/generate` - Generates JWT tokens
 - **POST** `/api/token/validate-auth-header` - Validates JWT tokens in the `iam-claimsetjwt` header
 
-### **Validation Features**
-- ✅ JWT structure validation (header.payload.signature)
-- ✅ JWT header validation (type and algorithm)
-- ✅ JWT payload validation (required claims: sub, iat, exp)
-- ✅ Token expiration checking
-- ✅ Detailed error responses with status codes
+### **How to Use in Tests**
+```gherkin
+Background:
+  * url baseUrl
+  * configure headers = karate.merge(defaultHeaders, getAuthHeaders())
 
-### **Test the Authentication Validation**
+Scenario: Your test
+  Given path '/api/users'
+  When method GET
+  Then status 200
+```
+
+## **Run Tests with Different Environments**
 ```bash
-# Run authentication validation tests
-mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local -Dkarate.options="classpath:com/example/karate/config/working-auth-validation.feature"
+# Run with authentication (default)
+mvn clean test -Dtest.env=local
 
-# Run all authentication tests
-mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local -Dkarate.options="--tags @auth"
+# Run without authentication (mock environment)
+mvn clean test -Dtest.env=mock
 
-# Run validation tests only
-mvn clean test -Dtest=SmokeTestRunner -Dtest.env=local -Dkarate.options="--tags @validation"
+# Run specific authentication tests
+mvn clean test -Dkarate.options="--tags @auth"
 ```

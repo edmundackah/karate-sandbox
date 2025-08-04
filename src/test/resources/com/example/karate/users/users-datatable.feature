@@ -3,10 +3,8 @@ Feature: User Data Table Examples - Multiple test scenarios with parallel execut
 Background:
   * url baseUrl
   * path '/api/users'
-  * configure headers = defaultHeaders
-  # Get token if required for this environment
-  * if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-  * if (requiresToken) karate.configure('headers', karate.merge(defaultHeaders, authHeader))
+  * def authHeader = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeader)
 
 @users @datatable @parallel
 Scenario Outline: Create multiple users with different data

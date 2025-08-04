@@ -29,6 +29,11 @@ function fn() {
     config.baseUrl = 'https://api.example.com';
     config.tokenUrl = 'https://token.example.com/api/token/generate';
     config.requiresToken = true;
+  } else if (env === 'mock') {
+    // Example of environment that doesn't require authentication
+    config.baseUrl = 'http://localhost:3000';
+    config.tokenUrl = null;
+    config.requiresToken = false;
   }
 
   // Common configuration
@@ -50,6 +55,20 @@ function fn() {
   // Note: Authentication will be handled in individual test features
   // This prevents issues with HTTP calls during configuration loading
 
+  // Load authentication utility functions
+  var authUtilsFeature = karate.callSingle('classpath:helpers/auth-utils.js');
+  config.authUtils = authUtilsFeature;
+  
+  // Convenience function to get auth headers
+  config.getAuthHeaders = function(forceAuth) {
+    return authUtilsFeature.getAuthHeaders(config, forceAuth);
+  };
+
   karate.log('Configuration loaded:', config);
+  
+  // Global variables
+  karate.set('authToken', null);
+  karate.set('config', config);
+
   return config;
 }

@@ -18,7 +18,7 @@ public class ProductController {
     private Long nextId = 1L;
 
     public ProductController() {
-        // Initialize with some dummy data
+        // Initialise with some dummy data
         products.add(new Product(nextId++, "Laptop", "High-performance laptop", new BigDecimal("999.99"), "Electronics", 10));
         products.add(new Product(nextId++, "Smartphone", "Latest smartphone model", new BigDecimal("699.99"), "Electronics", 25));
         products.add(new Product(nextId++, "Coffee Mug", "Ceramic coffee mug", new BigDecimal("12.99"), "Home", 100));

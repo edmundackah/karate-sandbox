@@ -3,10 +3,8 @@ Feature: Product CRUD Operations - Advanced HTTP examples with headers and file 
 Background:
   * url baseUrl
   * path '/api/products'
-  * configure headers = defaultHeaders
-  # Get token if required for this environment
-  * if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-      * if (requiresToken) karate.configure('headers', karate.merge(defaultHeaders, authHeader))
+  * def authHeader = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeader)
 
 @smoke @products @get
 Scenario: GET - Retrieve all products with filtering
@@ -50,7 +48,7 @@ Scenario: POST - Create product from JSON file
   
   # Add custom headers for this request
   * configure headers = karate.merge(defaultHeaders, { 'X-Request-ID': karate.uuid(), 'X-Client-Version': '1.0' })
-  * if (requiresToken) configure headers = karate.merge(headers, authHeader)
+
   
   Given request productData
   When method POST
@@ -73,7 +71,7 @@ Scenario: PUT - Update product with custom headers
   # Update with custom headers
   * def updatedProduct = read('classpath:testdata/products/updated-product.json')
   * configure headers = karate.merge(defaultHeaders, { 'X-Update-Reason': 'price-change', 'X-Operator': 'test-system' })
-  * if (requiresToken) configure headers = karate.merge(headers, authHeader)
+
   
   Given path '/' + productId
   And request updatedProduct

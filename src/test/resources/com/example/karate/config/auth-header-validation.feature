@@ -6,10 +6,8 @@ Background:
 
 @auth @validation @smoke
 Scenario: Validate authentication header with valid JWT token
-  # Apply authentication headers automatically
-  * call read('classpath:com/example/karate/config/auth-helper.feature')
-  * def authApplied = call applyAuth
-  * print 'Auth applied:', authApplied
+  * def authHeader = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeader)
   
   # Test the validation endpoint
   Given path '/api/token/validate-auth-header'
@@ -109,10 +107,8 @@ Scenario: Validate authentication header with expired JWT token
 
 @auth @validation @integration
 Scenario: End-to-end authentication header validation workflow
-  # Apply authentication headers automatically
-  * call read('classpath:com/example/karate/config/auth-helper.feature')
-  * def authApplied = call applyAuth
-  * print 'Auth applied:', authApplied
+  * def authHeader = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeader)
   
   # Step 1: Validate the token
   Given path '/api/token/validate-auth-header'
@@ -135,4 +131,4 @@ Scenario: End-to-end authentication header validation workflow
   Given path '/api/users'
   When method GET
   Then status 200
-  * print 'End-to-end authentication workflow completed successfully' 
+  * print 'End-to-end authentication workflow completed successfully'

@@ -28,15 +28,14 @@ Scenario: Health check - API is accessible via actuator
   And match response.status == 'UP'
 
 Scenario: Get authentication token if required
-  * if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-  * if (requiresToken) print 'Authentication token obtained'
-  * if (!requiresToken) print 'No authentication required for', env, 'environment'
+  * def authHeaders = getAuthHeaders()
+  * if (requiresToken) print 'Authentication token obtained:', authHeaders
+  * if (!requiresToken) print 'No authentication required for', env, 'environment - using dummy headers:', authHeaders
 
 Scenario: Verify authentication headers are configured
-  * if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-  * if (requiresToken) karate.configure('headers', karate.merge(defaultHeaders, authHeader))
-  * if (requiresToken) print 'Auth headers configured:', authHeader
-  * if (!requiresToken) print 'No auth headers needed for', env, 'environment'
+  * def authHeaders = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeaders)
+  * print 'Auth headers configured:', authHeaders
   
   # Make a test call to verify headers are working
   Given path '/api/health'

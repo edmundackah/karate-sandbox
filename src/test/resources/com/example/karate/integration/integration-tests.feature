@@ -2,10 +2,8 @@ Feature: Integration Tests - End-to-end workflows
 
 Background:
   * url baseUrl
-  * configure headers = defaultHeaders
-  # Get token if required for this environment
-  * if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-      * if (requiresToken) karate.configure('headers', karate.merge(defaultHeaders, authHeader))
+  * def authHeader = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeader)
 
 @integration @smoke @workflow
 Scenario: Complete user and product workflow

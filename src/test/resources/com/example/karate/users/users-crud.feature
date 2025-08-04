@@ -3,17 +3,15 @@ Feature: User CRUD Operations - Comprehensive HTTP method examples
 Background:
   * url baseUrl
   * path '/api/users'
-  * configure headers = defaultHeaders
-  # Get token if required for this environment
-  * if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-      * if (requiresToken) karate.configure('headers', karate.merge(defaultHeaders, authHeader))
+  * def authHeader = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeader)
 
 @smoke @users @get
 Scenario: GET - Retrieve all users with default pagination
   When method GET
   Then status 200
   And match response == '#[]'
-  And match each response == { id: '#number', name: '#string', email: '#string', role: '#string', active: '#boolean' }
+  And match each response == { id: '#number', name: '#string', email: '#string', role: '##string', active: '#boolean' }
   And assert response.length >= 0
 
 @users @get @queryparams

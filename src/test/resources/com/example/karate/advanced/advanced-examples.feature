@@ -2,10 +2,8 @@ Feature: Advanced Karate Examples - Complex scenarios and utilities
 
 Background:
   * url baseUrl
-  * configure headers = defaultHeaders
-  # Get token if required for this environment
-  * if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-      * if (requiresToken) karate.configure('headers', karate.merge(defaultHeaders, authHeader))
+  * def authHeader = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeader)
 
 @advanced @javascript @ignore
 Scenario: JavaScript functions and data manipulation

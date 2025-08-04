@@ -9,9 +9,6 @@ mvn clean test -Pkarate-smoke
 
 # Run with specific environment
 mvn clean test -Pkarate-smoke -Dtest.env=local
-
-# Helper script for common tasks
-./run-examples.sh smoke
 ```
 
 ### 2. Environment-Specific Testing
@@ -103,9 +100,15 @@ Then status 204
 
 #### Token Authentication
 ```gherkin
-# Automatic token handling (configured in background)
-* if (requiresToken) karate.call('classpath:com/example/karate/config/token-helper.feature')
-* if (requiresToken) configure headers = karate.merge(defaultHeaders, authHeader)
+# Simple one-line authentication using custom function
+* configure headers = karate.merge(defaultHeaders, getAuthHeaders())
+
+# Or if you need the headers separately
+* def authHeaders = getAuthHeaders()
+* configure headers = karate.merge(defaultHeaders, authHeaders)
+
+# Force authentication even when not required
+* def authHeaders = getAuthHeaders(true)
 ```
 
 ### 3. Query Parameters

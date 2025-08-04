@@ -36,32 +36,38 @@ Scenario: Health check - API is accessible
 
 **Why it's important**: This test fails fast if the API isn't running, saving time on other tests.
 
-### `token-helper.feature` - Authentication Management
+### Authentication System - Custom Function Approach
 
-**Purpose**: Automatically handle authentication for different environments.
+**Purpose**: Automatically handle authentication with zero configuration in tests.
 
+**Usage in Tests**:
+```gherkin
+Background:
+  * url baseUrl
+  * configure headers = karate.merge(defaultHeaders, getAuthHeaders())
+```
+
+**How it Works**:
+1. `getAuthHeaders()` checks if authentication is required (`requiresToken`)
+2. If required: Gets or reuses a cached JWT token
+3. If not required: Returns dummy headers for testing
+4. Automatically manages token lifecycle
+
+**Key Benefits**:
+- **Zero Configuration** - Just call `getAuthHeaders()`
+- **Automatic Caching** - Reuses tokens across tests
+- **Environment Aware** - Different behavior per environment
+- **Performance** - Minimizes token API calls
+
+**Behind the Scenes**:
+The function uses `token-helper.feature` to get real tokens when needed:
 ```gherkin
 Scenario: Get authentication token
   Given request tokenConfig
   When method POST
   Then status 200
-  And match response == { 'iam-claimsetjwt': '#string' }
-  
-  # Store token for other tests
-  * def authHeader = { 'iam-claimsetjwt': response['iam-claimsetjwt'] }
-  * karate.set('authToken', response['iam-claimsetjwt'])
+  * def authHeader = { 'iam-claimsetjwt': '#(response["iam-claimsetjwt"])' }
 ```
-
-**What it does**:
-1. Makes a POST request to get a token
-2. Validates the response has only the `iam-claimsetjwt` key
-3. Stores the token for use in other tests with the correct header format
-
-**Key Concepts**:
-- **`#string`** - Validates the value is a string
-- **Simple Response Format** - Token endpoint returns only `{"iam-claimsetjwt": "token_value"}`
-- **`karate.set()`** - Stores values for other tests to use
-- **Header Setup** - Creates proper authorisation header for subsequent requests
 
 ## User Tests (`users/`)
 
@@ -398,11 +404,15 @@ When method DELETE
 Then status 204
 ```
 
-### Pattern 2: Conditional Authentication
+### Pattern 2: Smart Authentication with Custom Function
 ```gherkin
 Background:
-  * if (requiresToken) karate.call('classpath:config/token-helper.feature')
-  * if (requiresToken) configure headers = karate.merge(defaultHeaders, authHeader)
+  # Automatic authentication - handles both auth and non-auth environments
+  * configure headers = karate.merge(defaultHeaders, getAuthHeaders())
+  
+  # Or if you need the headers separately:
+  * def authHeaders = getAuthHeaders()
+  * configure headers = karate.merge(defaultHeaders, authHeaders)
 ```
 
 ### Pattern 3: Dynamic Test Data
